@@ -9,17 +9,7 @@ public class HTTP {
   var  serverAddress : sockaddr_in?
   var     bufferSize : Int = 1024
 
-  func sockaddr_cast(p: UnsafeMutablePointer<Void>) -> UnsafeMutablePointer<sockaddr> {
-    return UnsafeMutablePointer<sockaddr>(p)
-  }
-
-  func echo(socket: Int32, _ output: String) {
-   output.withCString { (bytes) in
-       send(socket, bytes, Int(strlen(bytes)), 0)
-   }
-}
-
-  init(port: UInt16) {
+  public init(port: UInt16) {
     #if os(Linux)
     serverSocket = socket(AF_INET, Int32(SOCK_STREAM.rawValue), 0)
     #else
@@ -53,12 +43,8 @@ public class HTTP {
       print("Server started at port \(port)")
     }
   }
-    
-  func htons(value: CUnsignedShort) -> CUnsignedShort {
-    return (value << 8) + (value >> 8);
-  }
 
-  func start() {
+  public func start() {
     while (true) {
       if (listen(serverSocket, 10) < 0) {
         exit(1)
@@ -81,5 +67,19 @@ public class HTTP {
 
       close(clientSocket)
     }
+  }
+
+  func sockaddr_cast(p: UnsafeMutablePointer<Void>) -> UnsafeMutablePointer<sockaddr> {
+    return UnsafeMutablePointer<sockaddr>(p)
+  }
+
+  func echo(socket: Int32, _ output: String) {
+    output.withCString { (bytes) in
+       send(socket, bytes, Int(strlen(bytes)), 0)
+    }
+  }
+
+  func htons(value: CUnsignedShort) -> CUnsignedShort {
+    return (value << 8) + (value >> 8);
   }
 }
